@@ -1,4 +1,4 @@
 pebble_spark_hack
 =================
 
-Hacking two different technologies in the same project
+[A tweet in Spanish is worth a thousands words](https://twitter.com/patriciomolina/status/508466934715670528).
