@@ -1,5 +1,5 @@
 // ------------------------------------
-// Pebble integration v0.2 #HackDisrupt
+// Pebble integration v0.3 #HackDisrupt
 // ------------------------------------
 
 // Each led represents a different door
@@ -17,6 +17,14 @@ int doorOpen3 = 0;
 
 int allDoors = 0;
 
+unsigned long lastTimeOpened = 0UL; // Used for fridge (door3)
+unsigned long fridgeTolerate = 5000UL; // 1000UL = 1 second
+
+// Used for fridge led blinking
+int ledState = LOW;
+unsigned long previousMillis = 0UL;
+unsigned long interval = 100UL;
+
 // This routine runs only once upon reset
 void setup() {
     // This variable returns an integer that should be converted to binary
@@ -31,9 +39,9 @@ void setup() {
     digitalWrite(led2, HIGH);
     digitalWrite(led3, HIGH);
 
-    pinMode(door1, INPUT);
-    pinMode(door2, INPUT);
-    pinMode(door3, INPUT);
+    pinMode(door1, INPUT_PULLUP);
+    pinMode(door2, INPUT_PULLUP);
+    pinMode(door3, INPUT_PULLUP);
 }
 
 // This routine loops forever
@@ -58,9 +66,31 @@ void loop() {
     
     doorOpen3 = digitalRead(door3);
     if (doorOpen3) {
-        digitalWrite(led3, HIGH);
-        allDoors |= (1 << 0);
+        if (lastTimeOpened == 0UL) {
+            lastTimeOpened = millis();
+        }
+        unsigned long delta = millis() - lastTimeOpened;
+        if (delta > fridgeTolerate) {
+            // Fridge is open beyond toleration!
+            digitalWrite(led3, HIGH);
+            allDoors |= (1 << 0);
+        }
+        else {
+            // Fridge is open but we're under the toleration period. Blinking led
+            unsigned long currentMillis = millis();
+            if (currentMillis - previousMillis > interval) {
+                previousMillis = currentMillis;
+                if (ledState == LOW) {
+                    ledState = HIGH;
+                }
+                else {
+                    ledState = LOW;
+                }
+                digitalWrite(led3, ledState);
+            }
+        }
     } else {
+        lastTimeOpened = 0UL;
         digitalWrite(led3, LOW);
         allDoors &= ~(1 << 0);
     }
