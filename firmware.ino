@@ -3,15 +3,14 @@
 // ------------------------------------
 
 // Each led represents a different door
-int led1 = D0; // house
-int led2 = D1; // car
-int led3 = D2; // fridge
+int led1 = D0;
+int led2 = D1;
+int led3 = D2;
 
 int door1 = D7;
 int door2 = D6;
 int door3 = D5;
 
-// Assuming all doors are closed
 int doorOpen1 = 0;
 int doorOpen2 = 0;
 int doorOpen3 = 0;
@@ -39,7 +38,6 @@ void setup() {
 
 // This routine loops forever
 void loop() {
-    // See https://en.wikipedia.org/wiki/Bitwise_operations_in_C
     doorOpen1 = digitalRead(door1);
     if (doorOpen1) {
         digitalWrite(led1, HIGH);
